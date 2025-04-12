@@ -1,7 +1,10 @@
 import os
 import http.client
 import json
+from datetime import datetime, timedelta
+
 from pymongo import MongoClient
+
 
 def lambda_handler(event, context):
     conn = http.client.HTTPSConnection("tiktok-creative-center-api.p.rapidapi.com")
@@ -24,13 +27,12 @@ def lambda_handler(event, context):
 
     client = MongoClient(MONGO_URI)
     db = client["Hacknarok"]
-    collection = db["Tiktok"]
+    collection = db["TikTok"]
 
     for trend in trend_list:
         hashtag_name = trend.get("hashtag_name") or None
         country = trend.get("country_info", {}).get("value") or None
         is_promoted = trend.get("is_promoted") or False
-        timestamp = trend.get("trend") or []
         creators = trend.get("creators") or []
         publish_count = trend.get("publish_cnt") or 0
         video_views = trend.get("video_views") or 0
@@ -48,7 +50,7 @@ def lambda_handler(event, context):
             "creators": all_nicknames,
             "publish_count": publish_count,
             "video_views": video_views,
-            "timestamps": timestamp,
+            "date": datetime.now()
         })
 
     return {
